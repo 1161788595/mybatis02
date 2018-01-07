@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zking.dao.IUserDao">
+    <select id="all" resultType="User">
+        SELECT  * FROM  USER
+    </select>
+    <select id="allquery" resultType="User" parameterType="java.lang.String">
+          SELECT  * FROM  USER  WHERE  username LIKE '%${value}%'
+    </select>
+    <select id="allquery1" resultType="User" parameterType="java.lang.String">
+          SELECT  * FROM  USER  WHERE  username=#{username}
+    </select>
+    <select id="allquery2" resultType="User" parameterType="java.lang.String">
+          SELECT  * FROM  USER  WHERE  username LIKE  '%' #{username} '%'
+    </select>
+
+    <insert id="insert" parameterType="User" >
+        <selectKey keyProperty="mid" resultType="int" order="AFTER">
+            SELECT  LAST_INSERT_ID();
+        </selectKey>
+        INSERT  INTO  USER  (username,userpwd,usersex) VALUES (#{username},#{userpwd},#{usersex})
+    </insert>
+
+
+    <update id="update" parameterType="User">
+        UPDATE  USER  set username=#{username},userpwd=#{userpwd},usersex=#{usersex} WHERE  id=#{id}
+    </update>
+
+<delete id="delete" parameterType="int">
+    DELETE  FROM USER WHERE  id=#{id}
+</delete>
+
+    <select id="getallpage" parameterType="Uservo" resultType="User" >
+      SELECT *  FROM  USER where username LIKE '%${value}%' LIMIT  #{start},#{end}
+    </select>
+
+    <select id="getallpage1" resultType="User" parameterType="java.util.Map" >
+          SELECT *  FROM  USER WHERE  id  LIMIT  #{start},#{end}
+    </select>
+    <select id="getuserid" resultType="java.lang.String" parameterType="java.lang.Integer" >
+        SELECT username  FROM  USER WHERE id=#{id}
+    </select>
+
+    <!--sql片段-->
+    <sql id="sql">
+        <if test="id !=0">
+            id=#{id}
+        </if>
+        <if test="username!=null">
+            AND    username=#{username}
+        </if>
+        <if test="userpwd!=null">
+            OR  userpwd=#{userpwd}
+        </if>
+    </sql>
+    <!--动态sql-->
+    <select id="getallid" resultType="User" parameterType="Uservo">
+        SELECT  * FROM USER
+        <where>
+<include refid="sql"></include>
+        </where>
+
+    </select>
+    
+    <select id="getallidor" parameterType="Uservo" resultType="User">
+        SELECT * FROM  USER 
+        <where>
+            <foreach collection="ids" item="i" open="(" close=")" separator="or">
+                id=#{id}
+            </foreach>
+        </where>
+    </select>
+    <select id="getallidin" parameterType="Uservo" resultType="User">
+        SELECT * FROM  USER
+        <where>
+            <foreach collection="ids" item="i" open="id in (" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+    <select id="getallidin1" parameterType="Uservo" resultType="User">
+        SELECT * FROM  USER
+        <where>
+            <foreach collection="ids" item="i" open="id in (" close=")" separator=",">
+                #{i.id}
+            </foreach>
+        </where>
+    </select>
+
+    <update id="update11" parameterType="User">
+        UPDATE `user`
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="userpwd!=null">
+                userpwd=#{userpwd},
+            </if>
+            <if test="usersex!=null">
+                usersex=#{usersex}
+            </if>
+            <where>
+            <if test="id!=0">
+                id=#{id}
+            </if>
+            </where>
+        </set>
+    </update>
+
+
+
+</mapper>
